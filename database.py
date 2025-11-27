@@ -140,6 +140,28 @@ class Database:
             print(f"Error al obtener valor posterior: {e}")
             return None
 
+    def obtener_registros_con_errores(self, station_fk, columna):
+        if not self.connection:
+            print("No hay conexión activa.")
+            return []
+        try:
+            cursor = self.connection.cursor()
+            # Registros con valor -32768
+            query = f"""
+                        SELECT pk, date_time, {columna}
+                        FROM meteo.observations
+                        WHERE station_fk = %s
+                        AND {columna} = -32768
+                        ORDER BY date_time ASC
+                    """
+            cursor.execute(query, (station_fk,))
+            resultados = cursor.fetchall()
+            cursor.close()
+            return resultados
+        except Exception as e:
+            print(f"Error al obtener registros con error: {e}")
+            return []
+
 
 if __name__ == "__main__":
     # Leer credenciales desde variables de entorno
@@ -167,4 +189,9 @@ if __name__ == "__main__":
     print(f"   Valor anterior de precipitation en estación 1: {anterior}")
     posterior = db.obtener_valor_posterior(1, "precipitation", "2025-11-10 16:20:00")
     print(f"   Valor posterior de precipitation en estación 1: {posterior}")
+    errores = db.obtener_registros_con_errores(1, "precipitation")
+
+    for pk, fecha, valor in errores:
+        print(f"Registro {pk} en {fecha} tiene valor erróneo: {valor}")
+        # Aquí aplicarías el algoritmo de interpolación
     db.cerrar_conexion()
