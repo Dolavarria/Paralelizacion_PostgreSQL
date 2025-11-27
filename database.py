@@ -88,6 +88,58 @@ class Database:
             print(f"Error al obtener columnas numéricas: {e}")
             return []
 
+    def obtener_valor_anterior(self, station_fk, columna, fecha_hora):
+        if not self.connection:
+            print("No hay conexión activa.")
+            return None
+        try:
+            cursor = self.connection.cursor()
+            query = f"""
+                SELECT {columna}
+                FROM meteo.observations
+                WHERE station_fk = %s
+                  AND date_time < %s
+                  AND {columna} != -32768
+                ORDER BY date_time DESC
+                LIMIT 1
+            """
+            cursor.execute(query, (station_fk, fecha_hora))
+            resultado = cursor.fetchone()
+            cursor.close()
+            if resultado:
+                return resultado[0]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al obtener valor anterior: {e}")
+            return None
+
+    def obtener_valor_posterior(self, station_fk, columna, fecha_hora):
+        if not self.connection:
+            print("No hay conexión activa.")
+            return None
+        try:
+            cursor = self.connection.cursor()
+            query = f"""
+                SELECT {columna}
+                FROM meteo.observations
+                WHERE station_fk = %s
+                  AND date_time > %s
+                  AND {columna} != -32768
+                ORDER BY date_time ASC
+                LIMIT 1
+            """
+            cursor.execute(query, (station_fk, fecha_hora))
+            resultado = cursor.fetchone()
+            cursor.close()
+            if resultado:
+                return resultado[0]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al obtener valor posterior: {e}")
+            return None
+
 
 if __name__ == "__main__":
     # Leer credenciales desde variables de entorno
@@ -109,4 +161,10 @@ if __name__ == "__main__":
     for col in columnas:
         print(f"- {col}")
 
+    print("\n3. Probando obtener valor anterior...")
+    # Buscar un registro con -32768 primero
+    anterior = db.obtener_valor_anterior(1, "precipitation", "2025-11-10 16:20:00")
+    print(f"   Valor anterior de precipitation en estación 1: {anterior}")
+    posterior = db.obtener_valor_posterior(1, "precipitation", "2025-11-10 16:20:00")
+    print(f"   Valor posterior de precipitation en estación 1: {posterior}")
     db.cerrar_conexion()
