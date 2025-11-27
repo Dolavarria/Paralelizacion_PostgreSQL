@@ -192,6 +192,66 @@ class Database:
             if cursor:
                 cursor.close()
 
+    def contar_total_filas(self):
+        # Cuenta total de registros en meteo.observations
+        if not self.connection:
+            return 0
+        cursor = None
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT COUNT(*) FROM meteo.observations")
+            return cursor.fetchone()[0]
+        except Exception as e:
+            print(f"Error: {e}")
+            return 0
+        finally:
+            if cursor:
+                cursor.close()
+
+    def contar_errores_por_columna(self):
+        # Retorna dict con errores por columna {'col': cantidad}
+        columnas = self.obtener_columnas_numericas()
+        resultado = {}
+        for col in columnas:
+            cursor = None
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute(
+                    f"SELECT COUNT(*) FROM meteo.observations WHERE {col} = -32768"
+                )
+                resultado[col] = cursor.fetchone()[0]
+            except Exception as e:
+                resultado[col] = 0
+            finally:
+                if cursor:
+                    cursor.close()
+        return resultado
+
+    def contar_errores_por_estacion(self):
+        # Retorna dict con errores totales por estación {station_fk: cantidad}
+        columnas = self.obtener_columnas_numericas()
+        cursor = None
+        try:
+            cursor = self.connection.cursor()
+            # Construcción dinámica de CASE para contar errores en todas las columnas
+            cases = " + ".join(
+                [f"CASE WHEN {col} = -32768 THEN 1 ELSE 0 END" for col in columnas]
+            )
+            query = f"""
+                SELECT station_fk, SUM({cases}) as total_errores
+                FROM meteo.observations
+                GROUP BY station_fk
+                ORDER BY station_fk
+            """
+            cursor.execute(query)
+            return {fila[0]: fila[1] for fila in cursor.fetchall()}
+        except Exception as e:
+            print(f"Error: {e}")
+            return {}
+        finally:
+            if cursor:
+                cursor.close()
+
 
 if __name__ == "__main__":
     # Leer credenciales desde variables de entorno
