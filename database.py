@@ -162,6 +162,36 @@ class Database:
             print(f"Error al obtener registros con error: {e}")
             return []
 
+    def actualizar_observacion(self, pk, columna, nuevo_valor):
+
+        if not self.connection:
+            print("No hay conexión activa.")
+            return False
+
+        cursor = None
+        try:
+            cursor = self.connection.cursor()
+
+            query = f"""
+                UPDATE meteo.observations
+                SET {columna} = %s
+                WHERE pk = %s
+            """
+
+            cursor.execute(query, (nuevo_valor, pk))
+            self.connection.commit()  # Confirmar cambios
+
+            return True
+
+        except Exception as e:
+            self.connection.rollback()  # Revertir cambios si hay error
+            print(f"Error al actualizar observación: {e}")
+            return False
+
+        finally:
+            if cursor:
+                cursor.close()
+
 
 if __name__ == "__main__":
     # Leer credenciales desde variables de entorno
