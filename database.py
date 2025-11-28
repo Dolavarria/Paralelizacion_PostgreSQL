@@ -233,7 +233,7 @@ class Database:
         cursor = None
         try:
             cursor = self.connection.cursor()
-            # Construcción dinámica de CASE para contar errores en todas las columnas
+            # Contar errores en todas las columnas
             cases = " + ".join(
                 [f"CASE WHEN {col} = -32768 THEN 1 ELSE 0 END" for col in columnas]
             )
@@ -283,5 +283,4 @@ if __name__ == "__main__":
 
     for pk, fecha, valor in errores:
         print(f"Registro {pk} en {fecha} tiene valor erróneo: {valor}")
-        # Aquí aplicarías el algoritmo de interpolación
     db.cerrar_conexion()
