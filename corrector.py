@@ -53,9 +53,9 @@ def procesar_estacion(station_pk):
                 elif val_post is not None:
                     valor_corregido = val_post
 
-                # CASO 4: Estación vacía o corrupta total -> No se corrige
+                # CASO 4: Estación vacía o corrupta total -> Se asigna 0
                 else:
-                    continue
+                    valor_corregido = 0
 
                 # Actualizar BD
                 if valor_corregido is not None:
