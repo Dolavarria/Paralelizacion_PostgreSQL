@@ -1,6 +1,7 @@
 # Conexión a PostgreSQL y ejecución de consultas
 import psycopg2
 import config  # archivo que lee variables de entorno
+import logging
 
 
 ## Maneja la conexión y operaciones con PostgreSQL
@@ -24,17 +25,17 @@ class Database:
                 user=self.user,
                 password=self.password,
             )
-            print(f"Conexión exitosa a {self.dbname} en {self.host}:{self.port}")
+            logging.info(f"Conexión exitosa a {self.dbname} en {self.host}:{self.port}")
             return True
 
         except psycopg2.OperationalError as e:
             error_msg = str(e)
-            print(f"Error de conexión: {error_msg}")
+            logging.error(f"Error de conexión: {error_msg}")
             return False
 
         except Exception as e:
             # Cualquier otro error
-            print(f"Error inesperado al conectar: {e}")
+            logging.error(f"Error inesperado al conectar: {e}")
             return False
 
     def cerrar_conexion(self):
@@ -42,12 +43,12 @@ class Database:
         if self.connection:
             self.connection.close()
             self.connection = None
-            print("Conexión cerrada.")
+            logging.info("Conexión cerrada.")
 
     def obtener_todas_las_estaciones(self):
         # Retorna una lista con los IDs de todas las estaciones
         if not self.connection:
-            print("No hay conexión activa.")
+            logging.warning("No hay conexión activa.")  # <--- LOGGING
             return []
 
         try:
@@ -63,12 +64,12 @@ class Database:
             return lista_ids
 
         except Exception as e:
-            print(f"Error al obtener estaciones: {e}")
+            logging.error(f"Error al obtener estaciones: {e}")
             return []
 
     def obtener_columnas_numericas(self):
         if not self.connection:
-            print("No hay conexión activa.")
+            logging.warning("No hay conexión activa.")
             return []
         try:
             cursor = self.connection.cursor()
@@ -85,12 +86,12 @@ class Database:
             lista_columnas = [fila[0] for fila in resultados]
             return lista_columnas
         except Exception as e:
-            print(f"Error al obtener columnas numéricas: {e}")
+            logging.error(f"Error al obtener columnas numéricas: {e}")
             return []
 
     def obtener_valor_anterior(self, station_fk, columna, fecha_hora):
         if not self.connection:
-            print("No hay conexión activa.")
+            logging.warning("No hay conexión activa.")
             return None
         try:
             cursor = self.connection.cursor()
@@ -111,12 +112,12 @@ class Database:
             else:
                 return None
         except Exception as e:
-            print(f"Error al obtener valor anterior: {e}")
+            logging.error(f"Error al obtener valor anterior: {e}")
             return None
 
     def obtener_valor_posterior(self, station_fk, columna, fecha_hora):
         if not self.connection:
-            print("No hay conexión activa.")
+            logging.warning("No hay conexión activa.")
             return None
         try:
             cursor = self.connection.cursor()
@@ -137,12 +138,12 @@ class Database:
             else:
                 return None
         except Exception as e:
-            print(f"Error al obtener valor posterior: {e}")
+            logging.error(f"Error al obtener valor posterior: {e}")
             return None
 
     def obtener_registros_con_errores(self, station_fk, columna):
         if not self.connection:
-            print("No hay conexión activa.")
+            logging.warning("No hay conexión activa.")
             return []
         try:
             cursor = self.connection.cursor()
@@ -159,13 +160,13 @@ class Database:
             cursor.close()
             return resultados
         except Exception as e:
-            print(f"Error al obtener registros con error: {e}")
+            logging.error(f"Error al obtener registros con error: {e}")
             return []
 
     def actualizar_observacion(self, pk, columna, nuevo_valor):
 
         if not self.connection:
-            print("No hay conexión activa.")
+            logging.warning("No hay conexión activa.")
             return False
 
         cursor = None
@@ -185,7 +186,7 @@ class Database:
 
         except Exception as e:
             self.connection.rollback()  # Revertir cambios si hay error
-            print(f"Error al actualizar observación: {e}")
+            logging.error(f"Error al actualizar observación: {e}")
             return False
 
         finally:
@@ -202,7 +203,7 @@ class Database:
             cursor.execute("SELECT COUNT(*) FROM meteo.observations")
             return cursor.fetchone()[0]
         except Exception as e:
-            print(f"Error: {e}")
+            logging.error(f"Error: {e}")
             return 0
         finally:
             if cursor:
@@ -246,7 +247,7 @@ class Database:
             cursor.execute(query)
             return {fila[0]: fila[1] for fila in cursor.fetchall()}
         except Exception as e:
-            print(f"Error: {e}")
+            logging.error(f"Error: {e}")
             return {}
         finally:
             if cursor:
@@ -273,7 +274,7 @@ if __name__ == "__main__":
     for col in columnas:
         print(f"- {col}")
 
-    print("\n3. Probando obtener valor anterior...")
+    print("\nProbando obtener valor anterior...")
     # Buscar un registro con -32768 primero
     anterior = db.obtener_valor_anterior(1, "precipitation", "2025-11-10 16:20:00")
     print(f"   Valor anterior de precipitation en estación 1: {anterior}")

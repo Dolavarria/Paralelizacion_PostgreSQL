@@ -1,6 +1,7 @@
 # Lógica de correción
 import time
 import config
+import logging
 from database import Database
 
 
@@ -12,7 +13,7 @@ def procesar_estacion(station_pk):
     )
 
     if not db.conectar():
-        print(f"[Estación {station_pk}] Error: No se pudo conectar a la BD.")
+        logging.error(f"[Estación {station_pk}] Error: No se pudo conectar a la BD.")
         return 0
 
     correcciones_totales = 0
@@ -29,7 +30,7 @@ def procesar_estacion(station_pk):
             if not errores:
                 continue  # Si no hay errores en esta columna, pasamos a la siguiente
 
-            print(
+            logging.info(
                 f"[Estación {station_pk}] Columna '{col}': Corrigiendo {len(errores)} errores..."
             )
 
@@ -41,19 +42,19 @@ def procesar_estacion(station_pk):
 
                 valor_corregido = None
 
-                # CASO 1: Sándwich (Existen ambos) -> Promedio
+                # Existen ambos se calcula promedio
                 if val_ant is not None and val_post is not None:
                     valor_corregido = (val_ant + val_post) / 2
 
-                # CASO 2: Solo existe anterior -> Mantenemos el último válido
+                # Solo existe anterior mantenemos el último válido
                 elif val_ant is not None:
                     valor_corregido = val_ant
 
-                # CASO 3: Solo existe posterior -> Usamos el primero válido
+                # Si solo existe posterior usamos el primero válido
                 elif val_post is not None:
                     valor_corregido = val_post
 
-                # CASO 4: Estación vacía o corrupta total -> Se asigna 0
+                # Estación vacía o corrupta total se asigna 0
                 else:
                     valor_corregido = 0
 
@@ -66,14 +67,16 @@ def procesar_estacion(station_pk):
                         correcciones_totales += 1
 
     except Exception as e:
-        print(f"[Estación {station_pk}] Error crítico durante procesamiento: {e}")
+        logging.critical(
+            f"[Estación {station_pk}] Error crítico durante procesamiento: {e}"
+        )
 
     finally:
         db.cerrar_conexion()
 
     duration = time.time() - start_time
     if correcciones_totales > 0:
-        print(
+        logging.info(
             f"--> [Estación {station_pk}] Finalizada. {correcciones_totales} correcciones en {duration:.2f}s."
         )
 

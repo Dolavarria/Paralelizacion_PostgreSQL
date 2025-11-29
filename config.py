@@ -1,13 +1,14 @@
 # Lee variables de entorno
 import os
 import sys
+import logging
 
 
 # Obtener variables o lanzar error si no existen
 def obtener_variable_entorno(var_nombre, default=None):
     valor = os.getenv(var_nombre, default)
     if valor is None:
-        print(f"Error: La variable de entorno {var_nombre} no está definida.")
+        logging.error(f"La variable de entorno {var_nombre} no está definida.")
         sys.exit(1)
     return valor
 
@@ -22,15 +23,19 @@ def obtener_entero_valido(nombre, default=None, min_val=1, max_val=32):
     try:
         valor = int(valor_str)
     except ValueError:
-        print(f"Error: {nombre} debe ser un número entero.")
-        print(f"Valor recibido: '{valor_str}'")
+        logging.error(
+            f"{nombre} debe ser un número entero. Valor recibido: '{valor_str}'"
+        )
         sys.exit(1)
         return
 
     if valor < min_val or valor > max_val:
-        print(f"Error: {nombre} debe ser un número entero entre {min_val} y {max_val}.")
-        print(f"Valor recibido: '{valor}'")
-        print(f"Sugerencia: Tu sistema tiene {os.cpu_count()} núcleos disponibles.")
+        logging.error(
+            f"{nombre} debe ser un número entero entre {min_val} y {max_val}."
+        )
+        logging.error(
+            f"Valor recibido: '{valor}'. Sugerencia: Tu sistema tiene {os.cpu_count()} núcleos."
+        )
         sys.exit(1)
         return
     return valor

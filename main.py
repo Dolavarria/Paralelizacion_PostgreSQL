@@ -3,16 +3,23 @@ from multiprocessing import Pool
 import time
 import config
 import sys
+import logging
 from database import Database
 from corrector import procesar_estacion
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%H:%M:%S",
+    )
     print("=" * 60)
     print("CORRECTOR PARALELO DE DATOS METEOROLÓGICOS")
     print("=" * 60)
 
     inicio = time.time()
+    logging.info("Iniciando proceso de corrección")
 
     # Conectar a BDD
     db = Database(
@@ -24,7 +31,7 @@ def main():
     )
 
     if not db.conectar():
-        print("Error: No se pudo conectar a la base de datos")
+        logging.error("No se pudo conectar a la base de datos")
         return
 
     # Obtener estadísticas ANTES de la corrección
@@ -33,28 +40,35 @@ def main():
     errores_antes_est = db.contar_errores_por_estacion()
 
     total_errores_inicial = sum(errores_antes_col.values())
+    if total_errores_inicial == 0:
+        logging.info("No se encontraron errores (-32768) en la base de datos.")
+        logging.info("El proceso de corrección ya fue realizado anteriormente.")
+        db.cerrar_conexion()
+        return
 
-    print(f"Total de filas en la tabla: {total_filas:,}")
-    print(f"Total de valores erróneos (-32768): {total_errores_inicial:,}")
+    logging.info(f"Total de filas en la tabla: {total_filas:,}")
+    logging.info(f"Total de valores erróneos (-32768): {total_errores_inicial:,}")
 
     # Obtener lista de estaciones
     estaciones = db.obtener_todas_las_estaciones()
-    print(f"Total de estaciones a procesar: {len(estaciones)}")
+    logging.info(f"Total de estaciones a procesar: {len(estaciones)}")
     db.cerrar_conexion()
 
     # PROCESAMIENTO PARALELO
-    print(f"Procesando estaciones en paralelo ({config.NUM_PROCESOS} procesos)...")
+    logging.info(
+        f"Procesando estaciones en paralelo ({config.NUM_PROCESOS} procesos)..."
+    )
     resultados = []
     try:
         with Pool(processes=config.NUM_PROCESOS) as pool:
             resultados = pool.map(procesar_estacion, estaciones)
 
     except KeyboardInterrupt:
-        print("\n!!! Proceso interrumpido por el usuario !!!")
+        logging.warning("Proceso interrumpido por el usuario ")
         db.cerrar_conexion()
         sys.exit(1)
     except Exception as e:
-        print(f"\nError inesperado en el Pool de procesos: {e}")
+        logging.critical(f"Error inesperado en el Pool de procesos: {e}")
         db.cerrar_conexion()
         sys.exit(1)
 
