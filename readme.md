@@ -411,13 +411,17 @@ except Exception as e:
 ### Entorno de Pruebas
 COMPLETAR
 
-- **Hardware:** COMPLETAR
-- **Sistema Operativo:** COMPLETAR
+- **Hardware:**
+   - Procesador: Ryzen 5 7535HS 3.30 GHz 6 Nucleos 12 Hilos
+   - Ram: 16 GB
+   - SSD NVMe 500 GB 
+- **Sistema Operativo:**
+   - Ubuntu 24.04.3 LTS 
 - **Base de datos:** PostgreSQL 17
 - **Dataset:** 
-  - Total de filas: [Completar]
-  - Total de estaciones: [Completar]
-  - Valores erróneos iniciales: [Completar]
+  - Total de filas: 310169
+  - Total de estaciones: 136
+  - Valores erróneos iniciales: 171384
 
 ### Resultados de Paralelización
 
@@ -426,9 +430,20 @@ COMPLETAR
 
 | Procesos | Tiempo (s) | 
 |----------|------------|
-| 1        | X.XX       | 
-| 4        | X.XX       |
-| 8        | X.XX       | 
+| 1        | 759.81     | 
+| 4        | 247.19     |
+| 8        | 174.36     | 
+
+**Resultados visuales**
+
+<img width="439" height="242" alt="image" src="https://github.com/user-attachments/assets/60e80ce0-ce10-4fc1-8af2-3243b8fe33d6" /> 
+
+<img width="439" height="242" alt="image" src="https://github.com/user-attachments/assets/356b6459-9fcf-495a-8caf-bc7aa2529daf" /> 
+
+<img width="439" height="242" alt="image" src="https://github.com/user-attachments/assets/d1b6ef9d-559c-436f-a181-974a0a83f6a8" />
+
+- Como se observa al utilizar un proceso tenemos un tiempo de ejecucion de 759.81 segundos, pero al utilizar 4 procesos el tiempo de ejecucion es de 247.19 segundo esta siendo menor al primer lanzamiento, mientras que el tercer lanzamiento con 8 procesos el tiempo de ejecucion es 174.36 segundos ligeramente menor con respecto al 2 lanzamiento. Con estas 3 ejecuciones se entiende que al dar mas recursos el tiempo de ejecucion sera menor, pero la diferencia sera minima.
+
 
 ### Conclusiones
 
