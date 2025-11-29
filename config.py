@@ -2,7 +2,10 @@
 import os
 import sys
 import logging
+from dotenv import load_dotenv
 
+# Cargar variables desde .env automáticamente
+load_dotenv()
 
 # Obtener variables o lanzar error si no existen
 def obtener_variable_entorno(var_nombre, default=None):
