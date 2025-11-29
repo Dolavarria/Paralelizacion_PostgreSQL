@@ -419,7 +419,7 @@ COMPLETAR
   - Total de estaciones: [Completar]
   - Valores erróneos iniciales: [Completar]
 
-### Resultados de Escalabilidad
+### Resultados de Paralelización
 
 
 (COMPLETAR)
