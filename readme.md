@@ -4,6 +4,9 @@ Este proyecto implementa un sistema de corrección de datos meteorológicos corr
 
 ## Integrantes
 * Diego Olavarría
+* Martin Guerrero 
+* Javier Aucapan 
+
 
 ## Requisitos
 * Ubuntu Server 24.04 (o compatible)
