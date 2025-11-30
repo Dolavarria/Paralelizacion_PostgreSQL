@@ -409,8 +409,6 @@ except Exception as e:
 ## Pruebas de Rendimiento
 
 ### Entorno de Pruebas
-COMPLETAR
-
 - **Hardware:**
    - Procesador: Ryzen 5 7535HS 3.30 GHz 6 Nucleos 12 Hilos
    - Ram: 16 GB
@@ -424,9 +422,6 @@ COMPLETAR
   - Valores erróneos iniciales: 171384
 
 ### Resultados de Paralelización
-
-
-(COMPLETAR)
 
 | Procesos | Tiempo (s) | 
 |----------|------------|
@@ -442,17 +437,11 @@ COMPLETAR
 
 <img width="439" height="242" alt="image" src="https://github.com/user-attachments/assets/d1b6ef9d-559c-436f-a181-974a0a83f6a8" />
 
-- Como se observa al utilizar un proceso tenemos un tiempo de ejecucion de 759.81 segundos, pero al utilizar 4 procesos el tiempo de ejecucion es de 247.19 segundo esta siendo menor al primer lanzamiento, mientras que el tercer lanzamiento con 8 procesos el tiempo de ejecucion es 174.36 segundos ligeramente menor con respecto al 2 lanzamiento. Con estas 3 ejecuciones se entiende que al dar mas recursos el tiempo de ejecucion sera menor, pero la diferencia sera minima.
+- Como se observa, al utilizar un proceso tenemos un tiempo de ejecucion de 759.81 segundos, pero al utilizar 4 procesos el tiempo de ejecucion es de 247.19 segundo esta siendo menor al primer lanzamiento, mientras que el tercer lanzamiento con 8 procesos el tiempo de ejecucion es 174.36 segundos, valor menor respecto al 2do lanzamiento. Con estas 3 ejecuciones se entiende que al dar mas recursos el tiempo de ejecucion sera menor, pero la diferencia irá desminuyendo hasta llegar a un punto en el que en vez de mejora, el tiempo empeora.
 
 
 ### Conclusiones
-
-(COMPLETAR)
-
-
-**Configuración Óptima:**
-Para nuestro entorno, X procesos fue el punto óptimo. (COMPLETAR)
-
-**Observaciones:**
-- La eficiencia disminuye con más de X procesos (COMPLETAR)
+- La paralelización puede reducir a más de la mitad el tiempo requerido para analizar bases de datos de gran tamaño
+- Para nuestro entorno, 8 procesos fue el punto óptimo. 
 - Para datasets más grandes, el óptimo podría ser mayor 
+  
